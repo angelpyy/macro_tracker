@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@alptugidin/react-circular-progress-bar": "^1.1.2",
+    "bootstrap": "^5.3.3",
     "mongoose": "^8.3.2",
     "react": "^18.2.0",
+    "react-bootstrap": "^2.10.2",
     "react-date-picker": "^10.6.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.23.0"
