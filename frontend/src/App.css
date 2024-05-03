@@ -4,7 +4,15 @@
 }
 
 .gauges {
-  display: ;
-  max-height: 20%;
-  max-width: 20%;
+  max-height: 12%;
+  max-width: 12%;
+}
+
+.meal-card {
+  margin: 10px;
+
+}
+
+.add-meal {
+  margin: 20px;
 }
