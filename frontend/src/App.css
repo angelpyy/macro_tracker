@@ -4,8 +4,9 @@
 }
 
 .gauges {
-  max-height: 12%;
-  max-width: 12%;
+  display: flex;
+  justify-content: center;
+  max-width: 50%;
 }
 
 .meal-card {
