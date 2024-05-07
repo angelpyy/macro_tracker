@@ -32,19 +32,8 @@ const FoodSchema = new mongoose.Schema({
     date: {
         type: Date,
         default: Date.now,
+        required: false,
     },
 });
 
-const UserSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        required: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    foods: [FoodSchema],
-});
-
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('Food', FoodSchema);

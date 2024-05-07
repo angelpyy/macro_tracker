@@ -1,0 +1,23 @@
+.login_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 90vh;
+}
+
+.loginForm_wrapper{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.buttons {
+    /* background-color: blue; */
+    width: 50vw;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row-reverse;
+}

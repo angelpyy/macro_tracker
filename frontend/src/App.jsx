@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import HomeScreen from "./components/HomeScreen";
+import LoginPage from "./components/LoginPage";
+import MeowcroNavbar from "./components/Navbar";
+import ProtectedRoutes from "./components/ProtectedRoutes";
+import HomePage from "./components/HomePage";
 
 function App() {
   let navigate = useNavigate();
 
   return (
     <div>
+      <MeowcroNavbar />
       <Routes>
-        <Route exact path="/" element={<HomeScreen />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route element={<ProtectedRoutes />}>
+          <Route exact path="/" element={<HomePage />} />
+        </Route> 
       </Routes>
     </div>
   );

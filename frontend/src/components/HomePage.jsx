@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import MacroNavbar from './Navbar';
 import MealCards from './MealCards';
 import'../App.css';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 
 
-function HomeScreen() {
+function HomePage() {
   // TODO: Implement the food submission form
   // TODO: Fork the react-circular-progress-bar library and modify the Nested component
   const [nestedMacros, setNestedMacros] = useState({ cal: 0, fat: 0, carb: 0, protein: 0 });
@@ -22,7 +21,6 @@ function HomeScreen() {
   return (
     <div className="app">
       <Container fluid>
-        <Row> <MacroNavbar /> </ Row>
         <Row>
           <Col> 
             <MealCards updateMacros={updateMacros}/> 
@@ -57,4 +55,4 @@ function HomeScreen() {
   )
 }
 
-export default HomeScreen;
+export default HomePage;
