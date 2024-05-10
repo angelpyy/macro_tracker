@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
-import MacroNavbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
 import "../css/Login.css";
 
@@ -41,7 +40,7 @@ function LoginPage() {
 		}
 
 		try {
-			const response = await fetch("/Login", {
+			const response = await fetch("/login", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(data),
@@ -84,7 +83,7 @@ function LoginPage() {
 		}
 
 		try {
-			const response = await fetch("/Register", {
+			const response = await fetch("/register", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(data),
@@ -98,7 +97,7 @@ function LoginPage() {
 			const responseData = await response.json();
 			console.log(responseData); // log the response data to the console in the browser.
 			token = responseData.token;
-			navigate("/clientinformation");
+			navigate("/");
 		} catch (error) {
 			console.error("Error:", error);
 		}
