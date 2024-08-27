@@ -2,9 +2,10 @@ require('dotenv').config();
 const PORT = process.env.EXPRESS_PORT;
 const URI = process.env.MONGO_URI; 
 const express = require('express');
-const cors = require('cors');
 const mongoose = require('mongoose');
 const app = express();
+const cors = require('cors');
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 

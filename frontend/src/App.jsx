@@ -13,9 +13,9 @@ function App() {
     <div>
       <MeowcroNavbar />
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<LoginPage />} />
         <Route element={<ProtectedRoutes />}>
-          <Route exact path="/" element={<HomePage />} />
+          <Route exact path="/home" element={<HomePage />} />
         </Route> 
       </Routes>
     </div>

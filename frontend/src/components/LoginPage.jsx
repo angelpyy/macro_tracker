@@ -1,165 +1,121 @@
 import React, { useState } from "react";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import Alert from "react-bootstrap/Alert";
+import { Form, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "../css/Login.css";
 
 export var token = "";
 
-function LoginPage() {
-	const [username, setUsername] = useState("");
-	const [password, setPassword] = useState("");
-	const [usernameError, setUsernameError] = useState("");
-	const [passwordError, setPasswordError] = useState("");
-	const [showAlert, setShowAlert] = useState(false);
+const LoginPage = () => {
+  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState("");
+  const navigate = useNavigate();
 
-	const navigate = useNavigate();
+  const validateForm = () => {
+    const newErrors = {};
+    const { username, password } = formData;
 
-	const loginHandler = async (event) => {
-    	event.preventDefault(); // prevent the default form submission behavior
+    if (username.trim() === "") {
+      newErrors.username = "Username is required.";
+    } else if (username.includes(" ")) {
+      newErrors.username = "Username cannot contain spaces.";
+    }
 
-    	const data = { username, password }; // create a JSON object with the username and password.
+    if (password.trim() === "") {
+      newErrors.password = "Password is required.";
+    } else if (password.includes(" ")) {
+      newErrors.password = "Password cannot contain spaces.";
+    }
 
-		// Validate inputs
-		if (username.trim() === "") {
-			setUsernameError("Username is required.");
-			return;
-		}
-		if (username.includes(" ")) {
-		setUsernameError("Username cannot contain spaces.");
-		return;
-		}
-		if (password.trim() === "") {
-		setPasswordError("Password is required.");
-		return;
-		}
-		if (password.includes(" ")) {
-		setPasswordError("Password cannot contain spaces.");
-		return;
-		}
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-		try {
-			const response = await fetch("/login", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    setServerError(""); // reset server error message
+  };
 
-			if (!response.ok) {
-				throw new Error("Network response was not ok");
-			}
+  const handleSubmit = async (event, endpoint) => {
+    event.preventDefault();
 
-			const responseData = await response.json();
-			console.log(responseData); // log the response data to the console in the browser.
-			token = responseData.token;
-			navigate("/");
-		} catch (error) {
-			console.error("Error:", error);
-		}
-	};
+    // break if username and password are not valid
+    if (!validateForm()) {
+      return;
+    }
 
-	const registerHandler = async (event) => {
-    	event.preventDefault(); // prevent the default form submission behavior
+    try {
+      const response = await fetch(`/api/${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    	const data = { username, password }; // create a JSON object with the username and password.
+      const responseData = await response.json();
+      if (!response.ok) {
+        throw new Error(responseData.message || `${endpoint} failed!`);
+      }
 
-    	// Validate inputs
-		if (username.trim() === "") {
-			setUsernameError("Username is required.");
-			return;
-		}
-		if (username.includes(" ")) {
-			setUsernameError("Username cannot contain spaces.");
-			return;
-		}
-		if (password.trim() === "") {
-			setPasswordError("Password is required.");
-			return;
-		}
-		if (password.includes(" ")) {
-			setPasswordError("Password cannot contain spaces.");
-			return;
-		}
+      token = responseData.token;
+      navigate("/home");
+    } catch (error) {
+      console.error("Error:", error);
+      setServerError(error.message || "An unknown error occurred. Please try again.");
+    }
+  };
 
-		try {
-			const response = await fetch("/register", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
-
-			if (!response.ok) {
-				setShowAlert(true);
-				throw new Error("Network response was not ok");
-			}
-
-			const responseData = await response.json();
-			console.log(responseData); // log the response data to the console in the browser.
-			token = responseData.token;
-			navigate("/");
-		} catch (error) {
-			console.error("Error:", error);
-		}
-	};
-
-	//use state handlers to keep data entered fresh and correct
-	const handleUsernameChange = (event) => {
-		setUsername(event.target.value);
-		setUsernameError("");
-	};
-
-	const handlePasswordChange = (event) => {
-		setPassword(event.target.value);
-		setPasswordError("");
-	};
-
-	return (
-		<div className="login_container">
-		{" "}
-		<div className="loginForm_wrapper">
-			<Form>
-			<Form.Group className="mb-3" controlId="username">
-				<Form.Label>Username:</Form.Label>
-				<Form.Control
-					type="text"
-					placeholder="Enter Username"
-					value={username}
-					onChange={handleUsernameChange}
-					isInvalid={usernameError}
-					required
-				/>
-				<Form.Control.Feedback type="invalid">
-					{usernameError}
-				</Form.Control.Feedback>
-			</Form.Group>
-
-			<Form.Group className="mb-3" controlId="password">
-				<Form.Label>Password</Form.Label>
-				<Form.Control
-					type="password"
-					placeholder="Enter Password"
-					value={password}
-					onChange={handlePasswordChange}
-					isInvalid={passwordError}
-					required
-				/>
-				<Form.Control.Feedback type="invalid">
-					{passwordError}
-				</Form.Control.Feedback>
-			</Form.Group>
-			<div className="buttons">
-				<Button variant="primary" type="submit" onClick={loginHandler}>
-					Login
-				</Button>
-				<Button variant="danger" type="button" onClick={registerHandler}>
-					Register
-				</Button>
-			</div>
-			</Form>
-		</div>
-		</div>
-	);
-}
+  return (
+    <div className="login_container">
+      <div className="loginForm_wrapper">
+        <Form>
+          {["username", "password"].map((field) => (
+            <Form.Group key={field} className="mb-3">
+              <Form.Label>
+                {field.charAt(0).toUpperCase() + field.slice(1)}
+              </Form.Label>
+              <Form.Control
+                type={field === "password" ? "password" : "text"}
+                name={field}
+                value={formData[field]}
+                onChange={handleInputChange}
+                isInvalid={errors[field]}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors[field]}
+              </Form.Control.Feedback>
+            </Form.Group>
+          ))}
+          <div className="buttons">
+            <Button
+              variant="primary"
+              type="submit"
+              onClick={(event) => handleSubmit(event, "login")}
+            >
+              Login
+            </Button>
+            <Button
+              variant="primary"
+              type="submit"
+              onClick={(event) => handleSubmit(event, "register")}
+            >
+              Register
+            </Button>
+          </div>
+        </Form>
+        {serverError && (
+          <Alert
+            variant="danger"
+            onClose={() => setServerError("")}
+            dismissible
+          >
+            {serverError}
+          </Alert>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default LoginPage;
