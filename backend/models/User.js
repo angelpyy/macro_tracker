@@ -1,54 +1,45 @@
 const mongoose = require('mongoose');
-
-const FoodSchema = new mongoose.Schema({
-    foodName: {
-        type: String,
-        required: true,
-    },
-    calories: {
-        type: Number,
-        required: true,
-    },
-    fats: {
-        type: Number,
-        required: true,
-    },
-    carbs: {
-        type: Number,
-        required: true,
-    },
-    protein: {
-        type: Number,
-        required: true,
-    },
-    servingSize: {
-        type: Number,
-        required: true,
-    },
-    servings: {
-        type: Number,
-        required: true,
-    },
-    date: {
-        type: Date,
-        default: Date.now,
-        required: false,
-    },
-});
+const bcrypt = require('bcrypt');
 
 const UserSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
+        unique: true,
     },
     password: {
         type: String,
         required: true,
     },
-    foods: [FoodSchema],  // Use FoodSchema directly here
+    macroTargets: {
+        calories: {
+            type: Number,
+            default: 2000,
+        },
+        fats: {
+            type: Number,
+            default: 65,
+        },
+        carbs: {
+            type: Number,
+            default: 250,
+        },
+        protein: {
+            type: Number,
+            default: 150,
+        },
+    },
 });
 
-module.exports = {
-    Food: mongoose.model('Food', FoodSchema),
-    User: mongoose.model('User', UserSchema),
-};
+UserSchema.pre('save', async function (next) {
+    if (this.isModified('password')) {
+        this.password = await bcrypt.hash(this.password, 10);
+    }
+    next();
+});
+
+UserSchema.methods.comparePassword = async function(candidatePassword) {
+    return bcrypt.compare(candidatePassword, this.password);
+}
+
+module.exports = mongoose.model("User", UserSchema);

@@ -3,7 +3,7 @@ import { Form, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "../css/Login.css";
 
-export var token = "";
+export let token = "";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -38,6 +38,7 @@ const LoginPage = () => {
     setServerError(""); // reset server error message
   };
 
+  // endpoint is either "login" or "register"
   const handleSubmit = async (event, endpoint) => {
     event.preventDefault();
 
@@ -59,7 +60,11 @@ const LoginPage = () => {
       }
 
       token = responseData.token;
+      localStorage.setItem("token", token);
       navigate("/home");
+
+      // lil debug ts
+      console.log(token);
     } catch (error) {
       console.error("Error:", error);
       setServerError(error.message || "An unknown error occurred. Please try again.");

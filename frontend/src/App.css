@@ -3,17 +3,23 @@
   display: block;
 }
 
-.gauges {
-  display: flex;
-  justify-content: center;
-  max-width: 50%;
+.app {
+  text-align: center;
+  display: block;
 }
 
-.meal-card {
-  margin: 10px;
-
+.react-calendar {
+  width: 100% !important;
+  border: none !important;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-.add-meal {
-  margin: 20px;
+.react-calendar__tile--active {
+  background: #007bff !important;
+  color: white !important;
+}
+
+.CircularProgressbar {
+  width: 100px;
+  margin: 0 auto;
 }
