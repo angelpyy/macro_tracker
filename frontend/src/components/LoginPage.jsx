@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import "../css/Login.css";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
+  const { isAuthenticated, login, register } = useAuth();
   const navigate = useNavigate();
 
   // on page load check localstroage for token, if so, navigate to home
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
+    if (isAuthenticated) {
       navigate("/home");
     }
-  },[]);
+  }, [isAuthenticated, navigate]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -54,26 +55,16 @@ const LoginPage = () => {
     }
 
     try {
-      const response = await fetch(`/api/${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const responseData = await response.json();
-      if (!response.ok) {
-        throw new Error(responseData.message || `${endpoint} failed!`);
+      if (endpoint === "login") {
+        await login(formData.username, formData.password);
+      } else if (endpoint === "register") {
+        await register(formData.username, formData.password);
       }
-
-      const token = responseData.token;
-      localStorage.setItem("token", token);
-      navigate("/home");
-
-      // lil debug ts
-      console.log(token);
     } catch (error) {
       console.error("Error:", error);
-      setServerError(error.message || "An unknown error occurred. Please try again.");
+      setServerError(
+        error.message || "An unknown error occurred. Please try again."
+      );
     }
   };
 

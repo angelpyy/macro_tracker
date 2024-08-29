@@ -4,8 +4,11 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import '../App.css';
+import '../css/App.css';
 import { useNavigate } from 'react-router-dom';
+import FoodModal from './FoodModal';
+import TargetModal from './TargetModal';
+import { useAuth } from '../contexts/AuthContext';
 
 const HomePage = () => {
   const [date, setDate] = useState(new Date());
@@ -16,7 +19,7 @@ const HomePage = () => {
   const [showTargetModal, setShowTargetModal] = useState(false);
   const [currentMeal, setCurrentMeal] = useState(null);
   const [currentFood, setCurrentFood] = useState(null);
-  const [user, setUser] = useState(null);
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
    // const [foodList, setFoodList] = useState([]); // This would be fetched from the backend; TODO: implement backend
 
@@ -29,51 +32,25 @@ const HomePage = () => {
     { name: 'Brown Rice', calories: 216, protein: 5, carbs: 45, fat: 1.6 },
   ];
 
-  const fetchFoodList = async () => {
-    try {
-      const response = await fetch('/api/foods'); // Will not work currently; TODO: implement backend
-      const foods = await response.json();
-      setFoodList(foods);
-    } catch (error) {
-      console.error('Error fetching food list:', error);
-    }
-  };
+  // const fetchFoodList = async () => {
+  //   try {
+  //     const response = await fetch('/api/foods'); // Will not work currently; TODO: implement backend
+  //     const foods = await response.json();
+  //     setFoodList(foods);
+  //   } catch (error) {
+  //     console.error('Error fetching food list:', error);
+  //   }
+  // };
   
   useEffect(() => { 
-    const token = localStorage.getItem('token');
-    if (!token) {
+    if (!isAuthenticated) { 
+      console.log('User is not authenticated, redirecting to login page...');
       navigate('/');
     } else {
-      fetchUserData(token);
-    }
-  }, [navigate]); 
-
-  useEffect(() => {
-    if (user) {
       loadMealsFromServer();
       loadTargetsFromServer();
     }
-  }, [user, date]);
-
-  const fetchUserData = async (token) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/user', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch user data');
-      }
-      const data = await response.json();
-    } catch (error) {
-      console.log('Error fetching user data:', error);
-      console.log('Logging out and deleting token ( not deleting currently)...');
-      localStorage.removeItem('token');
-      navigate('/');
-    }
-  };
+  }, [isAuthenticated, navigate, date]); 
 
   const loadMealsFromServer = async () => {
     try {
@@ -82,6 +59,7 @@ const HomePage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
+      console.log('response:', response);
       if (response.ok) {
         const mealsData = await response.json();
         setMeals(mealsData);
@@ -325,116 +303,5 @@ const HomePage = () => {
     </Container>
   );
 };
-
-const FoodModal = ({ show, handleClose, handleSubmit, food, foodList }) => {
-  const [foodData, setFoodData] = useState(food || { name: '', calories: 0, protein: 0, carbs: 0, fat: 0 });
-
-  useEffect(() => {
-    setFoodData(food || { name: '', calories: 0, protein: 0, carbs: 0, fat: 0 });
-  }, [food]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFoodData({ ...foodData, [name]: name === 'name' ? value : Number(value) });
-  };
-
-  const handleFoodSelect = (e) => {
-    const selectedFood = foodList.find(f => f.name === e.target.value);
-    if (selectedFood) {
-      setFoodData(selectedFood);
-    }
-  };
-
-  return (
-    <Modal show={show} onHide={handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>{food ? 'Edit Food' : 'Add Food'}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Group>
-            <Form.Label>Select Food</Form.Label>
-            <Form.Control as="select" onChange={handleFoodSelect}>
-              <option value="">Custom Food</option>
-              {foodList.map(f => (
-                <option key={f.name} value={f.name}>{f.name}</option>
-              ))}
-            </Form.Control>
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>Name</Form.Label>
-            <Form.Control type="text" name="name" value={foodData.name} onChange={handleInputChange} />
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>Calories</Form.Label>
-            <Form.Control type="number" name="calories" value={foodData.calories} onChange={handleInputChange} />
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>Protein (g)</Form.Label>
-            <Form.Control type="number" name="protein" value={foodData.protein} onChange={handleInputChange} />
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>Carbs (g)</Form.Label>
-            <Form.Control type="number" name="carbs" value={foodData.carbs} onChange={handleInputChange} />
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>Fat (g)</Form.Label>
-            <Form.Control type="number" name="fat" value={foodData.fat} onChange={handleInputChange} />
-          </Form.Group>
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>Close</Button>
-        <Button variant="primary" onClick={() => handleSubmit(foodData)}>Save Changes</Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
-const TargetModal = ({ show, handleClose, handleSubmit, currentTargets }) => {
-  const [targets, setTargets] = useState(currentTargets);
-
-  useEffect(() => {
-    setTargets(currentTargets);
-  }, [currentTargets]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setTargets({ ...targets, [name]: Number(value) });
-  };
-
-  return (
-    <Modal show={show} onHide={handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>Edit Macro Targets</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Group>
-            <Form.Label>Calories</Form.Label>
-            <Form.Control type="number" name="calories" value={targets.calories} onChange={handleInputChange} />
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>Protein (g)</Form.Label>
-            <Form.Control type="number" name="protein" value={targets.protein} onChange={handleInputChange} />
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>Carbs (g)</Form.Label>
-            <Form.Control type="number" name="carbs" value={targets.carbs} onChange={handleInputChange} />
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>Fat (g)</Form.Label>
-            <Form.Control type="number" name="fat" value={targets.fat} onChange={handleInputChange} />
-          </Form.Group>
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>Close</Button>
-        <Button variant="primary" onClick={() => handleSubmit(targets)}>Save Changes</Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
 
 export default HomePage;
