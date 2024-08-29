@@ -63,15 +63,13 @@ const HomePage = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data);
-      } else {
+      if (!response.ok) {
         throw new Error('Failed to fetch user data');
       }
+      const data = await response.json();
     } catch (error) {
       console.log('Error fetching user data:', error);
-      console.log('Logging out and deleting token...');
+      console.log('Logging out and deleting token ( not deleting currently)...');
       localStorage.removeItem('token');
       navigate('/');
     }

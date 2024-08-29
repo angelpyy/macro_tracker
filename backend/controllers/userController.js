@@ -4,7 +4,7 @@ const DailyMeals = require("../models/DailyMeals");
 exports.getUserData = async (req, res) => {
     try {
         const user = await User.findById(req.user._id).select('-password');
-        req.json(user);
+        res.json(user);
     } catch (error) {
         res.status(500).json({ message: 'Failed to get user data', error: error.message });
     }

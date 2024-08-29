@@ -1,15 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "../css/Login.css";
-
-export let token = "";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const navigate = useNavigate();
+
+  // on page load check localstroage for token, if so, navigate to home
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/home");
+    }
+  },[]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -59,7 +65,7 @@ const LoginPage = () => {
         throw new Error(responseData.message || `${endpoint} failed!`);
       }
 
-      token = responseData.token;
+      const token = responseData.token;
       localStorage.setItem("token", token);
       navigate("/home");
 

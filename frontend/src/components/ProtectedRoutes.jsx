@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom"
-import { token } from "./LoginPage"
 
+const token = localStorage.getItem("token")
 
 const ProtectedRoutes = () => {
     let isAuthenticated = token ? true : false
