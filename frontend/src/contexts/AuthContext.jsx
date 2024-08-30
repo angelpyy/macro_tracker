@@ -10,12 +10,30 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check if user is authenticated on mount
+    checkAuthStatus();
+  }, []);
+
+  const checkAuthStatus = async () => {
     const token = localStorage.getItem("token");
     if (token) {
-      setIsAuthenticated(true);
-      fetchUserData(token);
+      try {
+        const response = await fetch('api/user',  {
+          headers:{
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!response.ok) {
+          throw new Error("Failed to authenticate");
+        }
+        const userData = await response.json();
+        setUser(userData);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error("An error occurred while checking authentication status", error);
+        await logout();
+      }
     }
-  }, []);
+  };
 
   const fetchUserData = async (token) => {
     try {
@@ -83,8 +101,13 @@ export const AuthProvider = ({ children }) => {
     navigate("/");
   }
 
+  const handleUnauthorized = () => {
+    logout();
+    navigate("/");
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, register, user }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, register, handleUnauthorized  }}>
       {children}
     </AuthContext.Provider>
   );
