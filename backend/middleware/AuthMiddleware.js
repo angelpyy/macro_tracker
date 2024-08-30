@@ -8,6 +8,9 @@ const authMiddleware = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_KEY);
         const user = await User.findById(decoded.userId);
     
+        console.log('[AuthMiddleware.js/authMiddleware] | req.header: ', req.header('Authorization'));
+        console.log('[AuthMiddleware.js/authMiddleware] | user: ', user.username, ' | user_id: ', user._id);
+        
         if (!user) {
             throw new Error();
         }
@@ -16,7 +19,7 @@ const authMiddleware = async (req, res, next) => {
         req.token = token;
         next();
     } catch (error) {
-        res.status(401).json({ message: 'Please authenticate' });
+        res.status(401).json({ message: 'Please authenticate', error: error.message });
     }
 };
 

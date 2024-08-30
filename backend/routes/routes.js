@@ -14,4 +14,6 @@ router.get('/user', authMiddleware, userController.getUserData);
 router.get('/meals', authMiddleware, userController.getUserMeals);
 router.get('/targets', authMiddleware, userController.getUserTargets);
 
+router.post('/meals', authMiddleware, userController.saveUserMeals);
+
 module.exports = router;

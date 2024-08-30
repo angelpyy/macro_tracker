@@ -20,6 +20,7 @@ const FoodModal = ({ show, handleClose, handleSubmit, food, foodList }) => {
     });
   };
 
+  // TODO: modify to handle controlled component for food selection
   const handleFoodSelect = (e) => {
     const selectedFood = foodList.find((f) => f.name === e.target.value);
     if (selectedFood) {
