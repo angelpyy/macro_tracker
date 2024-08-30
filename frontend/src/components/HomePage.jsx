@@ -13,8 +13,8 @@ import { useAuth } from '../contexts/AuthContext';
 const HomePage = () => {
   const [date, setDate] = useState(new Date());
   const [meals, setMeals] = useState([]);
-  const [macros, setMacros] = useState({ calories: 0, protein: 0, carbs: 0, fat: 0 });
-  const [targets, setTargets] = useState({ calories: 2000, protein: 150, carbs: 250, fat: 65 });
+  const [macros, setMacros] = useState({ calories: 0, protein: 0, carbs: 0, fats: 0 });
+  const [targets, setTargets] = useState({ calories: 2000, protein: 150, carbs: 250, fats: 65 });
   const [showFoodModal, setShowFoodModal] = useState(false);
   const [showTargetModal, setShowTargetModal] = useState(false);
   const [currentMeal, setCurrentMeal] = useState(null);
@@ -25,11 +25,11 @@ const HomePage = () => {
 
   // temporary placeholder for food list
   const foodList = [
-    { name: 'Apple', calories: 95, protein: 0.5, carbs: 25, fat: 0.3 },
-    { name: 'Banana', calories: 105, protein: 1.3, carbs: 27, fat: 0.4 },
-    { name: 'Orange', calories: 62, protein: 1.2, carbs: 15, fat: 0.2 },
-    { name: 'Chicken Breast', calories: 165, protein: 31, carbs: 0, fat: 3.6 },
-    { name: 'Brown Rice', calories: 216, protein: 5, carbs: 45, fat: 1.6 },
+    { name: 'Apple', calories: 95, protein: 0.5, carbs: 25, fats: 0.3 },
+    { name: 'Banana', calories: 105, protein: 1.3, carbs: 27, fats: 0.4 },
+    { name: 'Orange', calories: 62, protein: 1.2, carbs: 15, fats: 0.2 },
+    { name: 'Chicken Breast', calories: 165, protein: 31, carbs: 0, fats: 3.6 },
+    { name: 'Brown Rice', calories: 216, protein: 5, carbs: 45, fats: 1.6 },
   ];
 
   // const fetchFoodList = async () => {
@@ -43,7 +43,8 @@ const HomePage = () => {
   // };
   
   useEffect(() => { 
-    if (!isAuthenticated) { 
+    const token = localStorage.getItem('token');
+    if (!isAuthenticated && !token) { 
       console.log('User is not authenticated, redirecting to login page...');
       navigate('/');
     } else {
@@ -59,7 +60,6 @@ const HomePage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      console.log('response:', response);
       if (response.ok) {
         const mealsData = await response.json();
         setMeals(mealsData);
@@ -126,35 +126,6 @@ const HomePage = () => {
     }
   };
 
-  const loadMealsFromLocalStorage = () => {
-    const storedMeals = localStorage.getItem(`meals_${date.toDateString()}`);
-    if (storedMeals) {
-      setMeals(JSON.parse(storedMeals));
-      updateMacros(JSON.parse(storedMeals));
-    } else {
-      setMeals([
-        { id: 1, name: 'Breakfast', foods: [] },
-        { id: 2, name: 'Lunch', foods: [] },
-      ]);
-      setMacros({ calories: 0, protein: 0, carbs: 0, fat: 0 });
-    }
-  };
-
-  const loadTargetsFromLocalStorage = () => {
-    const storedTargets = localStorage.getItem('macroTargets');
-    if (storedTargets) {
-      setTargets(JSON.parse(storedTargets));
-    }
-  };
-
-  const saveMealsToLocalStorage = (updatedMeals) => {
-    localStorage.setItem(`meals_${date.toDateString()}`, JSON.stringify(updatedMeals));
-  };
-
-  const saveTargetsToLocalStorage = (updatedTargets) => {
-    localStorage.setItem('macroTargets', JSON.stringify(updatedTargets));
-  }
-
   const addMeal = () => {
     const newMeal = {
       id: meals.length + 1,
@@ -207,10 +178,10 @@ const HomePage = () => {
         acc.calories += food.calories || 0;
         acc.protein += food.protein || 0;
         acc.carbs += food.carbs || 0;
-        acc.fat += food.fat || 0;
+        acc.fats += food.fats || 0;
       });
       return acc;
-    }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
+    }, { calories: 0, protein: 0, carbs: 0, fats: 0 });
     setMacros(newMacros);
   }
 
@@ -278,8 +249,8 @@ const HomePage = () => {
                   <p className="text-center mt-2">Carbs</p>
                 </Col>
                 <Col xs={6}>
-                  <MacroProgressBar value={macros.fat} maxValue={targets.fat} color="#011627" />
-                  <p className="text-center mt-2">Fat</p>
+                  <MacroProgressBar value={macros.fats} maxValue={targets.fats} color="#011627" />
+                  <p className="text-center mt-2">Fats</p>
                 </Col>
               </Row>
               <Button onClick={() => setShowTargetModal(true)} className="mt-3">Edit Targets</Button>

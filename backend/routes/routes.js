@@ -12,5 +12,6 @@ router.post('/login', authController.login);
 // Protected routes
 router.get('/user', authMiddleware, userController.getUserData);
 router.get('/meals', authMiddleware, userController.getUserMeals);
+router.get('/targets', authMiddleware, userController.getUserTargets);
 
 module.exports = router;

@@ -6,6 +6,7 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,6 +24,7 @@ export const AuthProvider = ({ children }) => {
           }
         });
         if (!response.ok) {
+          localStorage.removeItem("token");
           throw new Error("Failed to authenticate");
         }
         const userData = await response.json();
@@ -33,6 +35,7 @@ export const AuthProvider = ({ children }) => {
         await logout();
       }
     }
+    setIsLoading(false);
   };
 
   const fetchUserData = async (token) => {
@@ -105,6 +108,10 @@ export const AuthProvider = ({ children }) => {
     logout();
     navigate("/");
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, user, login, logout, register, handleUnauthorized  }}>

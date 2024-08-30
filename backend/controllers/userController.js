@@ -19,3 +19,12 @@ exports.getUserMeals = async (req, res) => {
         res.status(500).json({ message: 'Failed to get user meals', error: error.message });
     }
 };
+
+exports.getUserTargets = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        res.json(user.macroTargets);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to get user targets', error: error.message });
+    }
+};
