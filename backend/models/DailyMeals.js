@@ -10,7 +10,10 @@ const DailyMealsSchema = new mongoose.Schema({
         required: true,
     },
     meals: [{
-        name: String,
+        name: {
+            type: String,
+            default: "Meal"
+        },
         foods: [{
             name: String,
             calories: Number,

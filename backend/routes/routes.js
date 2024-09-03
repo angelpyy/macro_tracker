@@ -9,11 +9,15 @@ const authMiddleware = require(path.join(__dirname, '..', 'middleware', 'AuthMid
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 
-// Protected routes
+// Protected route get requests
 router.get('/user', authMiddleware, userController.getUserData);
 router.get('/meals', authMiddleware, userController.getUserMeals);
 router.get('/targets', authMiddleware, userController.getUserTargets);
 
+// Protected route post requests
 router.post('/meals', authMiddleware, userController.saveUserMeals);
+
+// backend/routes/routes.js
+router.put('/meals/:mealId', authMiddleware, userController.updateMealName);
 
 module.exports = router;

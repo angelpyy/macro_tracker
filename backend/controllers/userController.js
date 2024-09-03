@@ -67,3 +67,28 @@ exports.saveUserMeals = async (req, res) => {
         res.status(500).json({ message: 'Failed to save user meals', error: error.message });
     }
 };
+
+exports.updateMealName = async (req, res) => {
+    try {
+        const { mealId } = req.params;
+        const { name } = req.body;
+        const userId = req.user._id;
+
+        // debug
+        console.log('Updating meal:', req.params.mealId, 'with name:', req.body.name);
+
+        const updatedMeal = await DailyMeals.findOneAndUpdate(
+            { "meals._id": mealId, user: userId },
+            { $set: { "meals.$.name": name } },
+            { new: true }
+        );
+
+        if (!updatedMeal) {
+            return res.status(404).json({ message: "Meal not found" });
+        }
+
+        res.json({ message: "Meal name updated successfully", meal: updatedMeal });
+    } catch (error) {
+        res.status(500).json({ message: "Error updating meal name", error: error.message });
+    }
+};
