@@ -3,12 +3,12 @@ import { Modal, Form, Button } from "react-bootstrap";
 
 const FoodModal = ({ show, handleClose, handleSubmit, food, foodList }) => {
   const [foodData, setFoodData] = useState(
-    food || { name: "", calories: 0, protein: 0, carbs: 0, fat: 0 }
+    food || { name: "", calories: 0, protein: 0, carbs: 0, fats: 0 }
   );
 
   useEffect(() => {
     setFoodData(
-      food || { name: "", calories: 0, protein: 0, carbs: 0, fat: 0 }
+      food || { name: "", calories: 0, protein: 0, carbs: 0, fats: 0 }
     );
   }, [food]);
 
@@ -16,7 +16,8 @@ const FoodModal = ({ show, handleClose, handleSubmit, food, foodList }) => {
     const { name, value } = e.target;
     setFoodData({
       ...foodData,
-      [name]: name === "name" ? value : Number(value),
+      // if name (of field being edited) is 'name', set value as is value, else convert value to number
+      [name]: name === 'name' ? value : (value === '' ? '' : Number(value)),
     });
   };
 
@@ -86,8 +87,8 @@ const FoodModal = ({ show, handleClose, handleSubmit, food, foodList }) => {
             <Form.Label>Fat (g)</Form.Label>
             <Form.Control
               type="number"
-              name="fat"
-              value={foodData.fat}
+              name="fats"
+              value={foodData.fats}
               onChange={handleInputChange}
             />
           </Form.Group>
