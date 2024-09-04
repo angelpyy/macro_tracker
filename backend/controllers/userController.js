@@ -92,3 +92,16 @@ exports.updateMealName = async (req, res) => {
         res.status(500).json({ message: "Error updating meal name", error: error.message });
     }
 };
+
+exports.saveUserTargets = async (req, res) => {
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.user._id,
+            { $set: { macroTargets: req.body } },
+            { new: true }
+        );
+        res.json(user.macroTargets);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to save user targets', error: error.message });
+    }
+};

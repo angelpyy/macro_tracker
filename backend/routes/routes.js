@@ -16,6 +16,7 @@ router.get('/targets', authMiddleware, userController.getUserTargets);
 
 // Protected route post requests
 router.post('/meals', authMiddleware, userController.saveUserMeals);
+router.post('/targets', authMiddleware, userController.saveUserTargets);
 
 // backend/routes/routes.js
 router.put('/meals/:mealId', authMiddleware, userController.updateMealName);

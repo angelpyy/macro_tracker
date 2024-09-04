@@ -10,8 +10,9 @@ const TargetModal = ({ show, handleClose, handleSubmit, currentTargets }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setTargets({ ...targets, [name]: Number(value) });
+    setTargets({ ...targets, [name]: value === '' ? '' : Number(value) });
   };
+
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -48,11 +49,11 @@ const TargetModal = ({ show, handleClose, handleSubmit, currentTargets }) => {
             />
           </Form.Group>
           <Form.Group>
-            <Form.Label>Fat (g)</Form.Label>
+            <Form.Label>Fats (g)</Form.Label>
             <Form.Control
               type="number"
-              name="fat"
-              value={targets.fat}
+              name="fats"
+              value={targets.fats}
               onChange={handleInputChange}
             />
           </Form.Group>

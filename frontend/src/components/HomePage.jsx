@@ -145,6 +145,8 @@ const HomePage = () => {
       if (!response.ok) {
         throw new Error("Failed to save targets");
       }
+      const savedTargets = await response.json();
+      setTargets(savedTargets)
     } catch (error) {
       console.error("Error saving targets:", error);
     }
