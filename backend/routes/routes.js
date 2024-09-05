@@ -5,6 +5,7 @@ const path = require('path');
 const authController = require(path.join(__dirname, '..', 'controllers', 'AuthController'));
 const userController = require(path.join(__dirname, '..', 'controllers', 'UserController'));
 const authMiddleware = require(path.join(__dirname, '..', 'middleware', 'AuthMiddleware'));
+const foodController = require(path.join(__dirname, '..', 'controllers', 'FoodController'));
 
 router.post('/register', authController.register);
 router.post('/login', authController.login);
@@ -20,5 +21,11 @@ router.post('/targets', authMiddleware, userController.saveUserTargets);
 
 // backend/routes/routes.js
 router.put('/meals/:mealId', authMiddleware, userController.updateMealName);
+
+// Food routes ts, control my food ts
+router.get('/foods', foodController.getAllFoods);
+router.post('/foods', authMiddleware, foodController.addFood);
+router.put('/foods/:foodId', authMiddleware, foodController.updateFood);
+router.delete('/foods/:foodId', authMiddleware, foodController.deleteFood);
 
 module.exports = router;

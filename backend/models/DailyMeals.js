@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const DailyMealsSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -12,17 +13,25 @@ const DailyMealsSchema = new mongoose.Schema({
     meals: [{
         name: {
             type: String,
-            default: "Meal"
+            default: "Meal",
         },
         foods: [{
-            name: String,
-            calories: Number,
-            fats: Number,
-            carbs: Number,
-            protein: Number,
-            servingSize: Number,
-            servings: Number,
-        }],
+            food: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Food',
+                required: true,
+            },
+            amount: {
+                value: Number,
+                unit: String,
+            },
+            calculatedNutrients: {
+                calories: Number,
+                fats: Number,
+                carbs: Number,
+                protein: Number,
+            },
+        }]
     }],
 });
 
