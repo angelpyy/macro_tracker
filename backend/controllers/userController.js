@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const DailyMeals = require("../models/DailyMeals");
+const Food = require("../models/Food"); // Make sure to import the Food model
 
 exports.getUserData = async (req, res) => {
     try {
@@ -45,26 +46,45 @@ exports.getUserTargets = async (req, res) => {
 exports.saveUserMeals = async (req, res) => {
     try {
         const { date, meals } = req.body;
-        const parsedDate = new Date(date);
-        parsedDate.setUTCHours(0, 0, 0, 0);
+        const userId = req.user._id;
 
-        const updateDailyMeals = await DailyMeals.findOneAndUpdate(
-            {
-                user: req.user._id,
-                date: parsedDate,
-            },
-            {
-                $set: { meals:meals }
-            },
-            {
-                new: true,
-                upsert: true,
-                setDefaultsOnInsert: true,
+        let dailyMeals = await DailyMeals.findOne({ user: userId, date });
+
+        if (!dailyMeals) {
+            dailyMeals = new DailyMeals({ user: userId, date, meals: [] });
+        }
+
+        for (let meal of meals) {
+            const newMeal = { name: meal.name, foods: [] };
+            for (let foodItem of meal.foods) {
+                const food = await Food.findById(foodItem.food);
+                if (!food) {
+                    return res.status(404).json({ message: `Food not found: ${foodItem.food}` });
+                }
+
+                const amount = foodItem.amount;
+                const ratio = amount.value / food.servingSize.value;
+
+                const calculatedNutrients = {
+                    calories: food.nutrients.calories * ratio,
+                    fats: food.nutrients.fats * ratio,
+                    carbs: food.nutrients.carbs * ratio,
+                    protein: food.nutrients.protein * ratio,
+                };
+
+                newMeal.foods.push({
+                    food: food._id,
+                    amount,
+                    calculatedNutrients,
+                });
             }
-        );
-        res.status(200).json({ message: 'User meals saved', dailyMeals: updateDailyMeals });
+            dailyMeals.meals.push(newMeal);
+        }
+
+        await dailyMeals.save();
+        res.json(dailyMeals);
     } catch (error) {
-        res.status(500).json({ message: 'Failed to save user meals', error: error.message });
+        res.status(400).json({ message: 'Error saving meals', error: error.message });
     }
 };
 
