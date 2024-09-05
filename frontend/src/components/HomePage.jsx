@@ -41,26 +41,26 @@ const HomePage = () => {
   const [editingMealId, setEditingMealId] = useState(null);
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
-  // const [foodList, setFoodList] = useState([]); // This would be fetched from the backend; TODO: implement backend
+  const [foodList, setFoodList] = useState([]); // This would be fetched from the backend; TODO: implement backend
 
-  // temporary placeholder for food list
-  const foodList = [
-    { name: "Apple", calories: 95, protein: 0.5, carbs: 25, fats: 0.3 },
-    { name: "Banana", calories: 105, protein: 1.3, carbs: 27, fats: 0.4 },
-    { name: "Orange", calories: 62, protein: 1.2, carbs: 15, fats: 0.2 },
-    { name: "Chicken Breast", calories: 165, protein: 31, carbs: 0, fats: 3.6 },
-    { name: "Brown Rice", calories: 216, protein: 5, carbs: 45, fats: 1.6 },
-  ];
+  // // temporary placeholder for food list
+  // const foodList = [
+  //   { name: "Apple", calories: 95, protein: 0.5, carbs: 25, fats: 0.3 },
+  //   { name: "Banana", calories: 105, protein: 1.3, carbs: 27, fats: 0.4 },
+  //   { name: "Orange", calories: 62, protein: 1.2, carbs: 15, fats: 0.2 },
+  //   { name: "Chicken Breast", calories: 165, protein: 31, carbs: 0, fats: 3.6 },
+  //   { name: "Brown Rice", calories: 216, protein: 5, carbs: 45, fats: 1.6 },
+  // ];
 
-  // const fetchFoodList = async () => {
-  //   try {
-  //     const response = await fetch('/api/foods'); // Will not work currently; TODO: implement backend
-  //     const foods = await response.json();
-  //     setFoodList(foods);
-  //   } catch (error) {
-  //     console.error('Error fetching food list:', error);
-  //   }
-  // };
+  const fetchFoodList = async () => {
+    try {
+      const response = await fetch('/api/foods'); // Will not work currently; TODO: implement backend
+      const foods = await response.json();
+      setFoodList(foods);
+    } catch (error) {
+      console.error('Error fetching food list:', error);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -70,6 +70,7 @@ const HomePage = () => {
     } else {
       loadMealsFromServer();
       loadTargetsFromServer();
+      fetchFoodList();
     }
   }, [isAuthenticated, navigate, date]);
 

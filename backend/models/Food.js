@@ -17,7 +17,7 @@ const FoodSchema = new mongoose.Schema({
         unit: {
             type: String,
             required: true,
-            enum: ["g", "oz", "ml", "fl oz", "cup", "tbsp", "tsp", "mL", "L", "pieces", "serving"],
+            enum: ["g", "oz", "ml", "fl oz", "cup", "tbsp", "tsp", "mL", "L", "pieces", "servings", "slices"],
         },
     },
     nutrients: {
