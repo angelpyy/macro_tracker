@@ -7,9 +7,6 @@ const authMiddleware = async (req, res, next) => {
         const token = req.header('Authorization').replace('Bearer ', '');
         const decoded = jwt.verify(token, process.env.JWT_KEY);
         const user = await User.findById(decoded.userId);
-    
-        console.log('[AuthMiddleware.js/authMiddleware] | req.header: ', req.header('Authorization'));
-        console.log('[AuthMiddleware.js/authMiddleware] | user: ', user.username, ' | user_id: ', user._id);
         
         if (!user) {
             throw new Error();

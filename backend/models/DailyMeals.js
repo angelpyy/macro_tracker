@@ -21,15 +21,10 @@ const DailyMealsSchema = new mongoose.Schema({
                 ref: 'Food',
                 required: true,
             },
-            amount: {
-                value: Number,
-                unit: String,
-            },
-            calculatedNutrients: {
-                calories: Number,
-                fats: Number,
-                carbs: Number,
-                protein: Number,
+            servings: {
+                type: Number,
+                required: true,
+                default: 1,
             },
         }]
     }],

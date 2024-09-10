@@ -12,14 +12,7 @@ exports.getAllFoods = async (req, res) => {
 exports.addFood = async (req, res) => {
     try {
         const newFood = new Food(req.body);
-
-        // debugging
-        console.log('newFood:', newFood);
-
         await newFood.save();
-
-        // debugging
-        console.log('\n\nNEW FOOD SAVED\n\n');
         res.status(201).json(newFood);
     } catch (error) {
         res.status(400).json({ message: 'Error adding food', error: error.message });
