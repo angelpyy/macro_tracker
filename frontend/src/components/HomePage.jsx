@@ -76,6 +76,9 @@ const HomePage = () => {
 
   const loadMealsFromServer = async () => {
     try {
+      // debugging
+      console.log('[HomePage.jsx/loadMealsFromServer] | date: ', date.toISOString());
+
       const response = await fetch(`/api/meals?date=${date.toISOString()}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -125,6 +128,10 @@ const HomePage = () => {
         },
         body: JSON.stringify({ date: date.toISOString(), meals: updatedMeals }),
       });
+
+      // debugging
+      console.log('[HomePage.jsx/saveMealsToServer] | body: ', JSON.stringify({ date: date.toISOString(), meals: updatedMeals }));
+      
       if (!response.ok) {
         throw new Error("Failed to save meals");
       }

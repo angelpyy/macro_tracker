@@ -25,8 +25,8 @@ exports.getUserMeals = async (req, res) => {
             },
         });
         
-        console.log('[UserController.js/getUserMeals] | req.user: ', req.user._id, ' | req.query: ', req.query);
         console.log('[UserController.js/getUserMeals] | meals: ', meals);
+        console.log('~'.repeat(50));
 
         res.json(meals ? meals.meals : []);
     } catch (error) {
@@ -47,39 +47,37 @@ exports.saveUserMeals = async (req, res) => {
     try {
         const { date, meals } = req.body;
         const userId = req.user._id;
+        const parsedDate = new Date(date);
+        parsedDate.setUTCHours(0, 0, 0, 0);
 
-        let dailyMeals = await DailyMeals.findOne({ user: userId, date });
+        let dailyMeals = await DailyMeals.findOne({ 
+            user: userId, 
+            date: {
+                $gte: parsedDate,
+                $lt: new Date(parsedDate.getTime() + 24 * 60 * 60 * 1000),
+            }
+        }).populate('meals.foods');
+
+        console.log('[UserController.js/saveUserMeals] | dailyMeals: ', dailyMeals);
+        console.log('~'.repeat(50));
 
         if (!dailyMeals) {
-            dailyMeals = new DailyMeals({ user: userId, date, meals: [] });
+            console.log('[UserController.js/saveUserMeals] | MEAL NOT FOUND: Creating new daily meals');
+            console.log('~'.repeat(50));
+            dailyMeals = new DailyMeals({ user: userId, date: parsedDate, meals: [] });
         }
 
-        for (let meal of meals) {
-            const newMeal = { name: meal.name, foods: [] };
-            for (let foodItem of meal.foods) {
-                const food = await Food.findById(foodItem.food);
-                if (!food) {
-                    return res.status(404).json({ message: `Food not found: ${foodItem.food}` });
-                }
+        dailyMeals.meals = meals.map(meal => ({
+            name: meal.name,
+            foods: meal.foods.map(food => ({
+                food: food._id,
+                servings: food.servings,
+            }))
+        }))
 
-                const amount = foodItem.amount;
-                const ratio = amount.value / food.servingSize.value;
-
-                const calculatedNutrients = {
-                    calories: food.nutrients.calories * ratio,
-                    fats: food.nutrients.fats * ratio,
-                    carbs: food.nutrients.carbs * ratio,
-                    protein: food.nutrients.protein * ratio,
-                };
-
-                newMeal.foods.push({
-                    food: food._id,
-                    amount,
-                    calculatedNutrients,
-                });
-            }
-            dailyMeals.meals.push(newMeal);
-        }
+        console.log('[UserController.js/saveUserMeals] | MEALS CLONED');
+        console.log('[UserController.js/saveUserMeals] | dailyMeals: ', dailyMeals);
+        console.log('~'.repeat(50));
 
         await dailyMeals.save();
         res.json(dailyMeals);
