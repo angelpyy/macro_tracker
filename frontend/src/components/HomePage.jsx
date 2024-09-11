@@ -76,12 +76,8 @@ const HomePage = () => {
       });
 
       // TODO: Handle loadMeals response here
-      if (response.ok) {
-        const mealsData = await response.json();
-        setMeals(mealsData);
-        updateMacros(mealsData);
-      }
-      
+
+
     } catch (error) {
       console.error("Error loading meals:", error);
     }
