@@ -24,8 +24,8 @@ export default function MacroNavbar() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link as={Link} to="/home">Home</Nav.Link>
-            <Nav.Link as={Link} to="/about">About</Nav.Link>
+            <Nav.Link as={Link} to="/home">home</Nav.Link>
+            <Nav.Link as={Link} to="/about">about</Nav.Link>
           </Nav>
           {isAuthenticated && (
             <Button variant="outline-light" onClick={handleLogout}>Logout</Button>

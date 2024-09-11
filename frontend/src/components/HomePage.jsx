@@ -67,24 +67,21 @@ const HomePage = () => {
 
   const loadMealsFromServer = async () => {
     try {
+      // Set date that we will be looking at for meals.
       console.log("Fetching meals for", date.toISOString());
-      const response = await fetch(`/api/meals?date=${date.toISOString()}`, {
+      const response = await fetch(`/api/fetchMeals?date=${date.toISOString()}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
+      // TODO: Handle loadMeals response here
       if (response.ok) {
         const mealsData = await response.json();
-        const mappedMeals = mealsData.map(meal => ({
-          ...meal,
-        }));
-
-        setMeals(mappedMeals);
-        updateMacros(mappedMeals);
-      } else {
-        throw new Error("Failed to fetch meals");
+        setMeals(mealsData);
+        updateMacros(mealsData);
       }
+      
     } catch (error) {
       console.error("Error loading meals:", error);
     }
@@ -108,16 +105,18 @@ const HomePage = () => {
     }
   };
 
-  const saveMealsToServer = async (updatedMeals) => {
+  const addMealtoServer = async (newMeal) => {
     try {
-      const response = await fetch("/api/meals", {
-        method: "POST",
+      console.log("SENDING REQUEST: ", JSON.stringify({ date: date.toISOString(), meal: newMeal }));
+      const response = await fetch("/api/addMeal", {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({ date: date.toISOString(), meals: updatedMeals }),
+        body: JSON.stringify({ date: date.toISOString(), meal: newMeal }),
       });
+
 
       if (!response.ok) {
         throw new Error("Failed to save meals");
@@ -147,15 +146,19 @@ const HomePage = () => {
     }
   };
 
-  const addMeal = () => {
+  const addNewMeal = () => {
+    // Create a new meal with a default name and no foods
     const newMeal = {
-      id: meals.length + 1,
       name: `Meal ${meals.length + 1}`,
-      foods: [],
+      foods: [ ],
     };
+
+    // Use the spread operator to create a new array with the new meal added
     const updatedMeals = [...meals, newMeal];
+
+    // Update the meals state with the new data and save to the server
     setMeals(updatedMeals);
-    saveMealsToServer(updatedMeals);
+    addMealtoServer(newMeal);
   };
 
   // open the food modal with the selected meal and food to allow editing
@@ -340,7 +343,7 @@ const HomePage = () => {
               </Card.Body>
             </Card>
           ))}
-          <Button onClick={addMeal}>Add Meal</Button>
+          <Button onClick={addNewMeal}>Add Meal</Button>
         </Col>
         <Col md={4}>
           <Card className="mb-3">

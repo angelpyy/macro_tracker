@@ -11,22 +11,11 @@ const DailyMealsSchema = new mongoose.Schema({
         required: true,
     },
     meals: [{
-        name: {
-            type: String,
-            default: "Meal",
+        meal: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Meal',
+            required: true,
         },
-        foods: [{
-            food: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Food',
-                required: true,
-            },
-            servings: {
-                type: Number,
-                required: true,
-                default: 1,
-            },
-        }]
     }],
 });
 

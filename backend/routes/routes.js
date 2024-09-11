@@ -7,27 +7,32 @@ const userController = require(path.join(__dirname, '..', 'controllers', 'UserCo
 const authMiddleware = require(path.join(__dirname, '..', 'middleware', 'AuthMiddleware'));
 const foodController = require(path.join(__dirname, '..', 'controllers', 'FoodController'));
 
+
+// Login and Registration Routes
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 
-// Protected route get requests
+// Get User Data: Username/Password
 router.get('/user', authMiddleware, userController.getUserData);
-router.get('/meals', authMiddleware, userController.getUserMeals);
+
+// Get User Macro Targets
+// TODD: Consider just slotting this with getUserData
 router.get('/targets', authMiddleware, userController.getUserTargets);
 
-// Protected route post requests
-router.post('/meals/addFood', authMiddleware, userController.pushFoodToMeal);
-router.put('/meals/updateFood', authMiddleware, userController.updateFoodInMeal);
-router.post('/meals', authMiddleware, userController.saveUserMeals);
+// Update the User Macro Targets
 router.post('/targets', authMiddleware, userController.saveUserTargets);
 
-// backend/routes/routes.js
-router.put('/meals/:mealId', authMiddleware, userController.updateMealName);
-
+// NO ISSUES WITH THIS AS OF YET
 // Food routes ts, control my food ts
 router.get('/foods', foodController.getAllFoods);
 router.post('/foods', authMiddleware, foodController.addFood);
 router.put('/foods/:foodId', authMiddleware, foodController.updateFood);
 router.delete('/foods/:foodId', authMiddleware, foodController.deleteFood);
+
+// GET user meals
+router.get('/fetchMeals', authMiddleware, userController.getUserMeals);
+
+// PUT user meals
+router.put('/addMeal', authMiddleware, userController.addMealtoDailyMeals);
 
 module.exports = router;
