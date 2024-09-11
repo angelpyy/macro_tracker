@@ -3,6 +3,7 @@ import { Modal, Form, Button, Row, Col } from "react-bootstrap";
 
 const FoodModal = ({ show, handleClose, handleSubmit, food, foodList }) => {
   const initialFoodData = {
+    _id: "",
     name: "",
     brand: "Generic",
     servingSize: { value: 100, unit: "g" },
@@ -10,7 +11,10 @@ const FoodModal = ({ show, handleClose, handleSubmit, food, foodList }) => {
     servings: 1
   }
   const [showDebug, setShowDebug] = useState(false);
-  const [foodData, setFoodData] = useState( food || initialFoodData );
+  const [foodData, setFoodData] = useState( food ? {
+    ...food.food, // spread the food object to get the nested properties
+    servings: food.servings // add the servings property
+  } : initialFoodData );
 
   useEffect(() => {
     setFoodData( food || initialFoodData );
@@ -26,6 +30,11 @@ const FoodModal = ({ show, handleClose, handleSubmit, food, foodList }) => {
           ...prevData[parent],
           [child]: value === '' ? '' : (child === 'unit' ? value : Number(value))
         }
+      }));
+    } else if (name === 'servings') {
+      setFoodData(prevData => ({ 
+        ... prevData,
+        servings: value === '' ? '' : Number(value)
       }));
     } else {
       setFoodData(prevData => ({

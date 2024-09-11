@@ -43,15 +43,6 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [foodList, setFoodList] = useState([]); // This would be fetched from the backend; TODO: implement backend
 
-  // // temporary placeholder for food list
-  // const foodList = [
-  //   { name: "Apple", calories: 95, protein: 0.5, carbs: 25, fats: 0.3 },
-  //   { name: "Banana", calories: 105, protein: 1.3, carbs: 27, fats: 0.4 },
-  //   { name: "Orange", calories: 62, protein: 1.2, carbs: 15, fats: 0.2 },
-  //   { name: "Chicken Breast", calories: 165, protein: 31, carbs: 0, fats: 3.6 },
-  //   { name: "Brown Rice", calories: 216, protein: 5, carbs: 45, fats: 1.6 },
-  // ];
-
   const fetchFoodList = async () => {
     try {
       const response = await fetch('/api/foods'); // Will not work currently; TODO: implement backend
@@ -76,20 +67,19 @@ const HomePage = () => {
 
   const loadMealsFromServer = async () => {
     try {
-      // debugging
-      console.log('[HomePage.jsx/loadMealsFromServer] | date: ', date.toISOString());
-
+      console.log("Fetching meals for", date.toISOString());
       const response = await fetch(`/api/meals?date=${date.toISOString()}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
+
       if (response.ok) {
         const mealsData = await response.json();
         const mappedMeals = mealsData.map(meal => ({
           ...meal,
-          id: meal._id,
         }));
+
         setMeals(mappedMeals);
         updateMacros(mappedMeals);
       } else {
@@ -129,9 +119,6 @@ const HomePage = () => {
         body: JSON.stringify({ date: date.toISOString(), meals: updatedMeals }),
       });
 
-      // debugging
-      console.log('[HomePage.jsx/saveMealsToServer] | body: ', JSON.stringify({ date: date.toISOString(), meals: updatedMeals }));
-      
       if (!response.ok) {
         throw new Error("Failed to save meals");
       }
@@ -178,32 +165,47 @@ const HomePage = () => {
     setShowFoodModal(true);
   };
 
-  const handleFoodSubmit = (foodData) => {
-    let updatedMeals;
-    if (currentFood) {
-      // we are editing an existing food
-      updatedMeals = meals.map((meal) => {
-        if (meal.id === currentMeal) {
-          const updatedFoods = meal.foods.map((food) =>
-            food === currentFood ? { ...food, ...foodData } : food
-          );
-          return { ...meal, foods: updatedFoods };
-        }
-        return meal;
+  const handleFoodSubmit = async (foodData) => {
+    try {
+      const endpoint = currentFood ? '/api/meals/updateFood' : '/api/meals/addFood';
+      const method = currentFood ? 'PUT' : 'POST';
+
+      console.log('Current food:', foodData);
+  
+      const response = await fetch(endpoint, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          mealId: currentMeal,
+          foodId: foodData._id,
+          servings: foodData.servings,
+          date: date.toISOString(),
+          currentFoodId: currentFood ? currentFood._id : null // Only needed for editing
+        }),
       });
-    } else {
-      // we are instead adding food yayyy
-      updatedMeals = meals.map((meal) => {
-        if (meal.id === currentMeal) {
-          return { ...meal, foods: [...meal.foods, foodData] };
-        }
-        return meal;
-      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to ${currentFood ? 'update' : 'add'} food in meal`);
+      }
+  
+      const updatedMeal = await response.json();
+      
+      // Update the meals state with the new data
+      setMeals(prevMeals => prevMeals.map(meal => 
+        meal._id === currentMeal ? updatedMeal : meal
+      ));
+  
+      // Update macros
+      updateMacros(meals);
+      setShowFoodModal(false);
+      setCurrentFood(null); // Reset currentFood after submission
+    } catch (error) {
+      console.error(`Error ${currentFood ? 'updating' : 'adding'} food in meal:`, error);
+      // Handle error (e.g., show an error message to the user)
     }
-    setMeals(updatedMeals);
-    saveMealsToServer(updatedMeals);
-    updateMacros(updatedMeals);
-    setShowFoodModal(false);
   };
 
   const updateMacros = (updatedMeals) => {
@@ -274,13 +276,13 @@ const HomePage = () => {
             {user ? user.username : "Loading..."}
           </h2>
           {meals.map((meal) => (
-            <Card key={meal.id} className="mb-3">
+            <Card key={meal._id} className="mb-3">
               <Card.Header>
-                {editingMealId === meal.id ? (
+                {editingMealId === meal._id ? (
                   <Form
                     onSubmit={(e) => {
                       e.preventDefault();
-                      handleMealNameUpdate(meal.id, e.target.mealName.value);
+                      handleMealNameUpdate(meal._id, e.target.mealName.value);
                     }}
                   >
                     <Form.Group className="d-flex">
@@ -322,9 +324,9 @@ const HomePage = () => {
               </Card.Header>
               <Card.Body>
                 <ul>
-                  {meal.foods.map((food, index) => (
-                    <li key={index}>
-                      {food.name} - {food.calories} cal
+                  {meal.foods.map((foodItem) => (
+                    <li key={foodItem._id}>
+                      {foodItem.food.name} - {foodItem.food.nutrients.calories * foodItem.servings} cal
                       <Button
                         variant="link"
                         onClick={() => openFoodModal(meal.id, food)}
