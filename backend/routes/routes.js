@@ -30,7 +30,7 @@ router.put('/foods/:foodId', authMiddleware, foodController.updateFood);
 router.delete('/foods/:foodId', authMiddleware, foodController.deleteFood);
 
 // GET user meals
-router.get('/fetchMeals', authMiddleware, userController.getUserMeals);
+router.get('/getUserMeals', authMiddleware, userController.getUserMeals);
 
 // PUT user meals
 router.put('/addMeal', authMiddleware, userController.addMealtoDailyMeals);

@@ -26,8 +26,23 @@ exports.getUserMeals = async (req, res) => {
             },
         }).populate('meals.meal');  // Populate the meal field with the meal document
 
-        console.log(dailyMeals);
-        res.json(dailyMeals ? dailyMeals.meals : []);
+        const formattedMeals = dailyMeals
+        ? dailyMeals.meals.map(mealData => ({
+            _id: mealData.meal._id,
+            name: mealData.meal.name,
+            foods: mealData.meal.foods.map(foodData => ({
+                _id: foodData._id,
+                food: {
+                    _id: foodData.food._id,
+                    name: foodData.food.name,
+                    nutrients: foodData.food.nutrients
+                },
+                servings: foodData.servings
+            }))
+        }))
+        : [];
+
+    res.json(formattedMeals);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Failed to get user meals', error: error.message });
@@ -123,3 +138,4 @@ exports.addMealtoDailyMeals = async (req, res) => {
         res.status(500).json({ message: 'Failed to add meal to daily meals', error: error.message });
     }
 };
+

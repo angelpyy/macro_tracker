@@ -69,15 +69,19 @@ const HomePage = () => {
     try {
       // Set date that we will be looking at for meals.
       console.log("Fetching meals for", date.toISOString());
-      const response = await fetch(`/api/fetchMeals?date=${date.toISOString()}`, {
+      const response = await fetch(`/api/getUserMeals?date=${date.toISOString()}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
-      // TODO: Handle loadMeals response here
+      if (!response.ok) {
+        throw new Error("Failed to fetch meals");
+      }
 
-
+      const mealsData = await response.json();
+      setMeals(mealsData);
+      // updateMacros(mealsData);
     } catch (error) {
       console.error("Error loading meals:", error);
     }
