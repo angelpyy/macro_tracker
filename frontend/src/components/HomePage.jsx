@@ -203,6 +203,8 @@ const HomePage = () => {
         const updatedMeals = meals.map((meal) =>
           meal._id === mealId ? { ...meal, name: newName } : meal
         );
+
+        console.log('~~ [Homepage.jsx/handleMealNameUpdate] ~~ || meal name has been updated: ', updatedMeals);
         setMeals(updatedMeals);
         setEditingMealId(null);
       } else {
