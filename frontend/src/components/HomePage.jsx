@@ -121,6 +121,11 @@ const HomePage = () => {
       if (!response.ok) {
         throw new Error("Failed to save meals");
       }
+
+      const updatedMeals = await response.json();
+      console.log('~~ [HomePage.jsx/addMealtoServer] || Setting meals to updatedMeals: ', updatedMeals);
+      console.log('~~ [HomePage.jsx/addMealtoServer] || Current meals before update: ', meals);
+      setMeals(updatedMeals);
     } catch (error) {
       console.error("Error saving meals:", error);
     }

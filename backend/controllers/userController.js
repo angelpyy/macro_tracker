@@ -125,7 +125,19 @@ exports.addMealtoDailyMeals = async (req, res) => {
 
         dailyMeals.meals.push({ meal: meal._id });
         await dailyMeals.save();
-        res.json(dailyMeals);
+
+        // Populate the meals after saving for the frontend
+        dailyMeals = await dailyMeals.populate('meals.meal');
+
+        // Fix the format of the resulting json to match the frontend
+        const formattedMeals = dailyMeals.meals.map(mealData => ({
+            _id: mealData.meal._id,
+            name: mealData.meal.name,
+            foods: mealData.meal.foods || []
+        }));
+
+        console.log('~~ [UserController.js/addMealtoDailyMeals] || Sending formatted meals: ', formattedMeals);
+        res.json(formattedMeals);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Failed to add meal to daily meals', error: error.message });
