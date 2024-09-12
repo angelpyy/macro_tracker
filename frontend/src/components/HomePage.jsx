@@ -170,41 +170,7 @@ const HomePage = () => {
 
   const handleFoodSubmit = async (foodData) => {
     try {
-      const endpoint = currentFood ? '/api/meals/updateFood' : '/api/meals/addFood';
-      const method = currentFood ? 'PUT' : 'POST';
-
-      console.log('Current food:', foodData);
-  
-      const response = await fetch(endpoint, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          mealId: currentMeal,
-          foodId: foodData._id,
-          servings: foodData.servings,
-          date: date.toISOString(),
-          currentFoodId: currentFood ? currentFood._id : null // Only needed for editing
-        }),
-      });
-  
-      if (!response.ok) {
-        throw new Error(`Failed to ${currentFood ? 'update' : 'add'} food in meal`);
-      }
-  
-      const updatedMeal = await response.json();
-      
-      // Update the meals state with the new data
-      setMeals(prevMeals => prevMeals.map(meal => 
-        meal._id === currentMeal ? updatedMeal : meal
-      ));
-  
-      // Update macros
-      updateMacros(meals);
-      setShowFoodModal(false);
-      setCurrentFood(null); // Reset currentFood after submission
+      // another womp womp
     } catch (error) {
       console.error(`Error ${currentFood ? 'updating' : 'adding'} food in meal:`, error);
       // Handle error (e.g., show an error message to the user)
@@ -212,20 +178,8 @@ const HomePage = () => {
   };
 
   const updateMacros = (updatedMeals) => {
-    const newMacros = updatedMeals.reduce(
-      (acc, meal) => {
-        meal.foods.forEach((food) => {
-          acc.calories += food.calories || 0;
-          acc.protein += food.protein || 0;
-          acc.carbs += food.carbs || 0;
-          acc.fats += food.fats || 0;
-        });
-        return acc;
-      },
-      { calories: 0, protein: 0, carbs: 0, fats: 0 }
-    );
-    setMacros(newMacros);
-  };
+    // certified womp womp
+  }
 
   const handleTargetSubmit = (newTargets) => {
     setTargets(newTargets);
