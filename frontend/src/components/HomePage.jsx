@@ -173,7 +173,6 @@ const HomePage = () => {
       // another womp womp
     } catch (error) {
       console.error(`Error ${currentFood ? 'updating' : 'adding'} food in meal:`, error);
-      // Handle error (e.g., show an error message to the user)
     }
   };
 
