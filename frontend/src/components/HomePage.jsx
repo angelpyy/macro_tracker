@@ -188,6 +188,7 @@ const HomePage = () => {
   };
 
   const handleMealNameUpdate = async (mealId, newName) => {
+    console.log(`/api/meals/${mealId}`)
     try {
       const response = await fetch(`/api/meals/${mealId}`, {
         method: "PUT",
@@ -200,7 +201,7 @@ const HomePage = () => {
 
       if (response.ok) {
         const updatedMeals = meals.map((meal) =>
-          meal.id === mealId ? { ...meal, name: newName } : meal
+          meal._id === mealId ? { ...meal, name: newName } : meal
         );
         setMeals(updatedMeals);
         setEditingMealId(null);
@@ -272,7 +273,7 @@ const HomePage = () => {
                     {meal.name}
                     <Button
                       variant="link"
-                      onClick={() => setEditingMealId(meal.id)}
+                      onClick={() => setEditingMealId(meal._id)}
                     >
                       <FaPencilAlt />
                     </Button>

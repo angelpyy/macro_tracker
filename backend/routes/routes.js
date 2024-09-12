@@ -35,4 +35,7 @@ router.get('/getUserMeals', authMiddleware, userController.getUserMeals);
 // PUT user meals
 router.put('/addMeal', authMiddleware, userController.addMealtoDailyMeals);
 
+// PUT to update meal name
+router.put('/meals/:mealId', authMiddleware, userController.updateMealName); 
+
 module.exports = router;

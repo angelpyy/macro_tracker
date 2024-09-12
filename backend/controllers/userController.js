@@ -53,20 +53,21 @@ exports.updateMealName = async (req, res) => {
     try {
         const { mealId } = req.params;
         const { name } = req.body;
-        const userId = req.user._id;
 
-        const updatedMeal = await DailyMeals.findOneAndUpdate(
-            { "meals._id": mealId, user: userId },
-            { $set: { "meals.$.name": name } },
+        const updatedMeal = await Meal.findOneAndUpdate(
+            { _id : mealId },
+            { $set: { name : name } },
             { new: true }
         );
 
         if (!updatedMeal) {
+            console.log('~~ [USERCONTROLLER.JS/UPDATEMEALNAME] || Meal not found son: ', mealId)
             return res.status(404).json({ message: "Meal not found" });
         }
 
         res.json({ message: "Meal name updated successfully", meal: updatedMeal });
     } catch (error) {
+        console.log('~~ [USERCONTROLLER.JS/UPDATEMEALNAME] || Error updating meal name', error.message);
         res.status(500).json({ message: "Error updating meal name", error: error.message });
     }
 };
@@ -101,9 +102,6 @@ exports.addMealtoDailyMeals = async (req, res) => {
         const parsedDate = new Date(date);
         parsedDate.setUTCHours(0, 0, 0, 0);
 
-        console.log('attepting findOne', parsedDate, meal, userId);
-        console.log('~'.repeat(50));
-
         // Try to find the corresponding daily meal
         let dailyMeals = await DailyMeals.findOne({
             user: userId,
@@ -124,11 +122,6 @@ exports.addMealtoDailyMeals = async (req, res) => {
             await newMeal.save();
             meal._id = newMeal._id;
         }
-
-        console.log(dailyMeals);
-        console.log('~'.repeat(50));
-        console.log(meal);
-        console.log('~'.repeat(50));
 
         dailyMeals.meals.push({ meal: meal._id });
         await dailyMeals.save();
